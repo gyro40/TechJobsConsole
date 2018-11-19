@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -43,20 +44,51 @@ namespace TechJobsConsole
             // load data, if not already loaded
             LoadData();
 
+
             List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
 
             foreach (Dictionary<string, string> row in AllJobs)
             {
                 string aValue = row[column];
+                bool contains = aValue.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
 
-                if (aValue.Contains(value))
+                if (contains == true)
                 {
                     jobs.Add(row);
+
+                    
                 }
             }
 
             return jobs;
         }
+
+        public static List<Dictionary<string, string>> FindByValue(string value)
+        {
+            // load data, if not already loaded
+            LoadData();
+
+
+
+            List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
+
+            foreach (Dictionary<string, string> row in AllJobs)
+            {
+                foreach (KeyValuePair<string, string> keyValuePair in row)
+                {
+                    string valuee = keyValuePair.Value;
+                    bool contains = valuee.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
+
+                    if (contains == true && !jobs.Contains(row))
+                    {
+                        jobs.Add(row);
+                    }
+                }
+            }
+
+            return jobs;
+        }
+
 
         /*
          * Load and parse data from job_data.csv
@@ -138,5 +170,13 @@ namespace TechJobsConsole
 
             return rowValues.ToArray();
         }
+    }
+}
+
+public static class StringExtensions
+{
+    public static bool Contains(this string source, string toCheck, StringComparison comp)
+    {
+        return source?.IndexOf(toCheck, comp) >= 0;
     }
 }
